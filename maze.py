@@ -47,8 +47,8 @@ class Grid:
         self.columns = columns
         self.grid = []
 
-        self.rowcount = -1
-        self.cellcount = -1
+        self.rowcount = 0
+        self.cellcount = 0
 
         self.__prepare_grid()
         self.__configure_cells()
@@ -81,27 +81,68 @@ class Grid:
     def __len__(self):
         return self.rows*self.columns
 
-    def each_row(self):
-        while self.rowcount < self.rows-1:
-            self.rowcount += 1
-            yield self.grid[self.rowcount]
+    def each_row(self, forward=True):
+        if forward:
+            while self.rowcount < self.rows:
+                self.rowcount += 1
+                yield self.grid[self.rowcount-1]
+        else:
+            while self.rowcount > 0:
+                self.rowcount -= 1
+                yield self.grid[self.rowcount]
 
     def reload_rows(self):
-        self.rowcount = -1
+        self.rowcount = 0
 
-    def each_cell(self):
-        while self.cellcount < len(self)-1:
-            self.cellcount +=1
-            yield self.grid[self.cellcount//self.rows][self.cellcount % self.columns]
+    def each_cell(self, forward=True):
+        if forward:
+            while self.cellcount < len(self):
+                self.cellcount +=1
+                yield self.grid[(self.cellcount-1)//self.rows][(self.cellcount-1) % self.columns]
+        else:
+            while self.cellcount > 0:
+                self.cellcount -=1
+                yield self.grid[(self.cellcount)//self.rows][(self.cellcount) % self.columns]
 
     def reload_cells(self):
-        self.cellcount = -1
+        self.cellcount = 0
 
     def __repr__(self):
         return "Grid (%r,%r)" % (self.rows, self.columns)
 
     def __str__(self):
-        return "Grid row %s column %s" % (self.rows, self.columns)
+        #return "Grid row %s column %s" % (self.rows, self.columns)
+        output = "+" + "---+" * self.columns +"\n"
+        self.reload_rows()
+        for row in self.each_row():
+            eastboundary = ""
+            southboundary = ""
+            for cellid in range(len(row)):
+
+                if cellid == 0:
+                    eastboundary +="|"
+                else:
+                    if  row[cellid].is_linked(row[cellid-1]):
+                        eastboundary += " "
+                    else:
+                        eastboundary += "|"
+                eastboundary += "   "
+
+                if row[cellid].neighbors['south']:
+                    if row[cellid].is_linked(row[cellid].neighbors['south']):
+                        southboundary += "+   "
+                    else:
+                        southboundary += "+---"
+                else:
+                    southboundary += "+---"
+
+            eastboundary += "|\n"
+            southboundary += "+\n"
+
+            output += eastboundary
+            output += southboundary
+
+        return output
 
 if __name__ == '__main__':
     pass

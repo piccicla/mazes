@@ -1,4 +1,5 @@
 import maze
+from binary_tree import Binary_tree
 
 print('##################################')
 print('testing Cell class')
@@ -44,13 +45,28 @@ print('row iteration')
 for row in g.each_row():
     print(row)
 print('cell iteration')
-for row in g.each_cell():
-    print(row)
+for cell in g.each_cell():
+    print(cell)
 print('row iteration after reloading')
 g.reload_rows()
 for row in g.each_row():
     print(row)
 print('cell iteration after reloading')
 g.reload_cells()
-for row in g.each_cell():
+for cell in g.each_cell():
+    print(cell)
+print('row iteration backward')
+for row in g.each_row(forward=False):
     print(row)
+print('cell iteration backward')
+for cell in g.each_cell(forward=False):
+    print(cell)
+
+print('##################################')
+print('testing Binary tree')
+
+g=maze.Grid(10,10)
+Binary_tree(g)
+print(g)
+
+
